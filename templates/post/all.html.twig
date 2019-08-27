@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% for post in posts %}
+        <table>
+        <tr>
+            <td>{{ post.title }}</td>
+            <td>{{ post.description }}</td>
+            <td>
+                <a href="{{ path('post_show', { 'id': post.id }) }}">show</a>
+            </td>
+            <td>
+                <a href="{{ path('post_edit', { 'id': post.id }) }}">edit</a>
+            </td>
+            <td>
+                <a href="{{ path('post_delete', { 'id': post.id }) }}">delete</a>
+            </td>
+        </tr>
+        </table>
+    {% endfor %}
+{% endblock %}

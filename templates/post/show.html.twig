@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Post</h1>
+    <div class="show">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.description }}</p>
+        <p>{{ post.date|date("Y-m-d") }}</p>
+        <img src="/uploads/images/{{post.imageName}}" />
+    </div>
+{% endblock %}
