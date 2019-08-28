@@ -1,21 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <form action="{{ path('post_list') }}" method="get" class="search-form" enctype="multipart/form-data">
+        <input type="search" name="search" value="{{ app.request.get('search') }}" class="search">
+        <button class="btn btn-lg btn-primary" type="submit">Search</button>
+    </form>
+
+    <form action="{{ path('post_list') }}" method="get" class="filter-form" enctype="multipart/form-data">
+        <input type="number" name="rating" value="{{ app.request.get('rating') }}">
+        <input type="date" name="date" value="{{ app.request.get('date') }}">
+        <button class="btn btn-lg btn-primary" type="submit">Filter</button>
+    </form>
+
+
     {% for post in posts %}
-        {#<div class="article-container my-1">#}
-            {#<a href="#">#}
-                {#<img class="article-img" src="{{ asset('/uploads/images/'~post.imageName) }}">#}
-                {#<div class="article-title d-inline-block pl-3 align-middle">#}
-                    {#<span>Why do Asteroids Taste Like Bacon?</span>#}
-                    {#<br>#}
-                    {#<span class="pl-5 article-details float-right"> 3 hours ago</span>#}
-                {#</div>#}
-            {#</a>#}
-        {#</div>#}
-
-
-
-
         <table>
         <tr>
             <td>{{ post.title }}</td>

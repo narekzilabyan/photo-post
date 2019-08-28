@@ -21,11 +21,15 @@ class PostController extends AbstractController
      * @Route("/list", name="post_list")
      * @Template()
      */
-    public function all()
+    public function all(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
 
-        $posts = $em->getRepository(Post::class)->findAll();
+        $search = $request->get('search');
+        $rating = $request->get('rating');
+        $date = $request->get('date');
+
+        $posts = $em->getRepository(Post::class)->findWithFilter($search, $rating, $date);
 
         return ['posts' => $posts];
     }

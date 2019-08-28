@@ -73,4 +73,29 @@ class PostRepository extends ServiceEntityRepository
         $em->persist($post);
         $em->flush();
     }
+
+    public function findWithFilter($search = null, $rating = null, $date = null)
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->select('p');
+
+        if ($search) {
+            $qb->andWhere('p.title LIKE :search')
+                ->setParameter('search','%' . $search . '%');
+        }
+
+        if ($rating) {
+            $qb->andWhere('p.rating = :rating')
+                ->setParameter('rating', $rating);
+        }
+
+        if ($date) {
+            $qb->andWhere('p.date = :date')
+                ->setParameter('date', $date);
+        }
+
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
+    }
 }
