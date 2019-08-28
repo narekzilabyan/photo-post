@@ -47,4 +47,30 @@ class PostRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @param int $id
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function updateRating(int $id): void
+    {
+        // get summery votes
+        $result = $this->createQueryBuilder('p')
+            ->select('avg(v.vote)')
+            ->join('p.votes', 'v')
+            ->where('p.id = :post')
+            ->setParameter('post', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $post = $this->find($id);
+
+        $em = $this->getEntityManager();
+        $post->setRating(intval($result) ?? 0);
+
+        $em->persist($post);
+        $em->flush();
+    }
 }

@@ -26,6 +26,11 @@ class User implements UserInterface
     private $email;
 
     /**
+     * @ORM\Column(type="string", length=50)
+     */
+    private $displayName;
+
+    /**
      * @ORM\Column(type="json")
      */
     private $roles = [];
@@ -71,6 +76,22 @@ class User implements UserInterface
     public function getUsername(): string
     {
         return (string) $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDisplayName()
+    {
+        return $this->displayName;
+    }
+
+    /**
+     * @param mixed $displayName
+     */
+    public function setDisplayName($displayName): void
+    {
+        $this->displayName = $displayName;
     }
 
     /**

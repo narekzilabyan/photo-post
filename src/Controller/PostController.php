@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Entity\Vote;
 use App\Form\PostType;
+use App\Form\VoteType;
 use App\Service\FileUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -32,7 +34,13 @@ class PostController extends AbstractController
      */
     public function show(Post $post)
     {
-        return ['post' => $post];
+        $em = $this->getDoctrine()->getManager();
+
+        $vote = $em->getRepository(Vote::class)->findOneBy(
+            ['post' => $post, 'user' => $this->getUser()]
+        );
+
+        return ['post' => $post, 'vote' => $vote];
     }
 
     /**
@@ -105,4 +113,39 @@ class PostController extends AbstractController
      */
     public function delete()
     {}
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @Route("/vote", name="post_vote")
+     */
+    public function vote(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $postId = $request->get('postId');
+        $voteNumber = $request->get('vote');
+
+        $post = $em->getRepository(Post::class)->find($postId);
+
+        $vote = $em->getRepository(Vote::class)->findOneBy(
+            ['post' => $post, 'user' => $this->getUser()]
+        );
+
+        if ($post && !$vote){
+            $vote = new Vote();
+            $vote->setPost($post);
+            $vote->setUser($this->getUser());
+            $vote->setVote(intval($voteNumber));
+
+            $em->persist($vote);
+            $em->flush();
+
+            // update post reputation
+            $em->getRepository(Post::class)->updateRating($vote->getPost()->getId());
+        }
+
+        return $this->redirectToRoute('post_show', array('id' => $post->getId()));
+    }
 }

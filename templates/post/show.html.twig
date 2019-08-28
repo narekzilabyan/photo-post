@@ -5,7 +5,20 @@
     <div class="show">
         <h2>{{ post.title }}</h2>
         <p>{{ post.description }}</p>
+        <p>{{ post.rating }}</p>
         <p>{{ post.date|date("Y-m-d") }}</p>
         <img src="/uploads/images/{{post.imageName}}" />
     </div>
+
+    {% if is_granted("ROLE_USER") %}
+        <div class="vote">
+        {% if vote is defined %}
+            <p>{{ vote.vote }}</p>
+        {% else %}
+            {% for i in 0..5 %}
+                <a href="{{ path('post_vote', { 'postId': post.id, 'vote' : i }) }}">{{ i }}</a>
+            {% endfor %}
+        {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}
