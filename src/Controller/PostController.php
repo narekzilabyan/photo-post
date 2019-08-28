@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Post;
 use App\Entity\Vote;
+use App\Form\CommentType;
 use App\Form\PostType;
 use App\Form\VoteType;
 use App\Service\FileUploader;
@@ -40,7 +42,15 @@ class PostController extends AbstractController
             ['post' => $post, 'user' => $this->getUser()]
         );
 
-        return ['post' => $post, 'vote' => $vote];
+        $comments = $em->getRepository(Comment::class)->findParentComments($post->getId());
+
+        $comment = new Comment();
+        $commentForm = $this->createForm(CommentType::class, $comment);
+
+        return ['post' => $post,
+                'vote' => $vote,
+                'comments'=> $comments,
+                'commentForm' => $commentForm->createView()];
     }
 
     /**
@@ -146,6 +156,46 @@ class PostController extends AbstractController
             $em->getRepository(Post::class)->updateRating($vote->getPost()->getId());
         }
 
-        return $this->redirectToRoute('post_show', array('id' => $post->getId()));
+        return $this->redirectToRoute('post_show', array('id' => $postId));
+    }
+
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     *
+     * @Route("/comment", name="post_comment")
+     */
+    public function comment(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $parentId = $request->get('parentId');
+        $postId = $request->get('postId');
+        $post = $em->getRepository(Post::class)->find($postId);
+
+        if ($post) {
+            $comment = new Comment();
+
+            $form = $this->createForm(CommentType::class, $comment);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $comment->setAuthor($this->getUser()->getDisplayName());
+                $comment->setPost($post);
+
+                if ($parentId) {
+                    $parent = $em->getRepository(Comment::class)->find($parentId);
+                    $comment->setParent($parent);
+                    $parent->addChild($comment);
+
+                    $em->persist($parent);
+                }
+
+                $em->persist($comment);
+                $em->flush();
+            }
+        }
+
+        return $this->redirectToRoute('post_show', array('id' => $postId));
     }
 }

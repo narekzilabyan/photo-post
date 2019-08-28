@@ -20,5 +20,31 @@
             {% endfor %}
         {% endif %}
         </div>
+
+        <div class="add-comment">
+            <form action="{{ path('post_comment', { 'postId': post.id }) }}" method="post" class="comment-form" enctype="multipart/form-data">
+                <div class="comment-box">
+                    <textarea  name="comment[content]" required="required"></textarea>
+                </div>
+                <button class="btn btn-lg btn-primary" type="submit">Add comment</button>
+            </form>
+        </div>
+
+        <div class="comment">
+            {% for comment in comments %}
+                <p>{{ comment.content }}</p>
+                {% if comment.children is defined %}
+                    {% for reply in comment.children %}
+                        <p>{{ reply.content }}</p>
+                    {% endfor %}
+                {% endif %}
+                <form action="{{ path('post_comment', { 'postId': post.id, 'parentId' : comment.id }) }}" method="post" class="comment-form" enctype="multipart/form-data">
+                    <div class="comment-box">
+                        <textarea  name="comment[content]" required="required"></textarea>
+                    </div>
+                    <button class="btn btn-lg btn-primary" type="submit">Add reply</button>
+                </form>
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}
