@@ -52,7 +52,7 @@ class SecurityController extends AbstractController
             $event = new InteractiveLoginEvent($request, $token);
             $eventDispatcher->dispatch("security.interactive_login", $event);
 
-            return $this->redirectToRoute('');
+            return $this->redirectToRoute('post_list');
         }
 
         return $this->render('security/register.html.twig', [

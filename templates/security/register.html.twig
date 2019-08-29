@@ -3,13 +3,27 @@
 {% block title %}Register{% endblock %}
 
 {% block body %}
-    <h1>Register</h1>
+    <main>
+        <form method="post" name="registration_form" class="form-signin">
+            <h1 class="h3 mb-3 font-weight-normal text-center">Create account</h1>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.displayName) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword) }}
+            <input type="text" id="registration_form_displayName" name="registration_form[displayName]"
+                   required="required"
+                   maxlength="50" class="form-control" placeholder="Display name">
 
-        <button class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+            <input type="text" id="registration_form_email" name="registration_form[email]" required="required"
+                   maxlength="180" class="form-control" placeholder="Email">
+
+            <input type="password" id="registration_form_plainPassword" name="registration_form[plainPassword]"
+                   required="required" class="form-control" placeholder="Password">
+
+            <button style="margin-top: 20px" class="btn btn-lg btn-primary btn-block" type="submit">
+                Sign up
+            </button>
+            {{ form_widget(registrationForm._token) }}
+
+            <p class="text-center" style="margin-top: 1rem;">Already have an account? <a href="{{ path('app_login') }}">Sign in</a>
+            </p>
+        </form>
+    </main>
 {% endblock %}

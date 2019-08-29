@@ -35,6 +35,19 @@ class PostController extends AbstractController
     }
 
     /**
+     * @Route("/admin", name="post_admin")
+     * @Template()
+     */
+    public function admin(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $posts = $em->getRepository(Post::class)->findBy(['author' => $this->getUser()]);
+
+        return ['posts' => $posts];
+    }
+
+    /**
      * @Route("/show/{id}", name="post_show")
      * @Template()
      */
@@ -117,7 +130,7 @@ class PostController extends AbstractController
             return $this->redirectToRoute('post_show', array('id' => $post->getId()));
         }
 
-        return $this->render('post/edit.html.twig', [
+        return $this->render('post/create.html.twig', [
             'form' => $form->createView()
         ]);
     }

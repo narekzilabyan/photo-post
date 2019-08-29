@@ -3,60 +3,94 @@
 {% block javascripts %}
     <script type="text/javascript">
         function showReplyBox(id) {
-            document.getElementById('reply'+id).style.display = "block";
-            document.getElementById(id+'reply').style.display = "none";
+            document.getElementById('reply' + id).style.display = "block";
+            document.getElementById(id + 'reply').style.display = "none";
         }
     </script>
 {% endblock %}
 
 {% block body %}
-    <h1>Post</h1>
-    <div class="show">
-        <h2>{{ post.title }}</h2>
-        <p>{{ post.description }}</p>
-        <p>{{ post.rating }}</p>
-        <p>{{ post.date|date("Y-m-d") }}</p>
-        <img src="/uploads/images/{{post.imageName}}" />
-    </div>
+    {{ parent() }}
+    <main>
+        <div class="container">
+            <div class="show">
+                <h1 class="mt-4">{{ post.title }}</h1>
+                <hr>
+                <p>Posted on {{ post.date|date("F jS, Y") }}</p>
+                <p>Rating: {{ post.rating }}</p>
+                {% if is_granted("ROLE_USER") %}
+                <div class="vote">
+                    {% if vote is not null %}
+                        <p>Your vote: <span>{{ vote.vote }}</span></p>
+                    {% else %}
+                        <p>Add your vote:
+                        {% for i in 0..5 %}
+                            <a href="{{ path('post_vote', { 'postId': post.id, 'vote' : i }) }}">{{ i }}</a>
+                        {% endfor %}
+                        </p>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <hr>
 
-    {% if is_granted("ROLE_USER") %}
-        <div class="vote">
-        {% if vote is not null %}
-            <p>{{ vote.vote }}</p>
-        {% else %}
-            {% for i in 0..5 %}
-                <a href="{{ path('post_vote', { 'postId': post.id, 'vote' : i }) }}">{{ i }}</a>
+            <img class="post-image mx-auto d-block" src="/uploads/images/{{ post.imageName }}"/>
+            <p>{{ post.description }}</p>
+
+            {% if is_granted("ROLE_USER") %}
+
+            <div class="card" style="margin-bottom: 15px">
+                <div class="card-body">
+                    <div class="add-comment">
+                        <form action="{{ path('post_comment', { 'postId': post.id }) }}" method="post"
+                              class="comment-form" enctype="multipart/form-data">
+                            <div class="comment-box form-group">
+                                <textarea name="comment[content]" required="required" class="form-control"
+                                          rows="3"></textarea>
+                            </div>
+                            <button class="btn btn-lg btn-primary" type="submit">Add comment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            {% for comment in comments %}
+                <div class="comment media mb-4">
+                    <img class="d-flex mr-3 rounded-circle" src="{{ asset("/build/images/user_placeholder.png") }}" alt="Avatar">
+                    <div class="media-body">
+                        <h5 class="mt-0">{{ comment.author }}</h5>
+                        <p>{{ comment.content }}</p>
+
+                        <p onclick="showReplyBox('{{ comment.id }}')" id="{{ comment.id }}reply" style="color: blue">Reply</p>
+                        <div style="display: none" id="reply{{ comment.id }}">
+                            <form action="{{ path('post_comment', { 'postId': post.id, 'parentId' : comment.id }) }}"
+                                  method="post" class="comment-form" enctype="multipart/form-data">
+                                <div class="card-body">
+                                    <div class="comment-box form-group">
+                                        <textarea name="comment[content]" required="required"  class="form-control" rows="3"></textarea>
+                                    </div>
+                                    <button class="btn btn-lg btn-primary" type="submit">Add reply</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {% if comment.children is defined %}
+                            {% for reply in comment.children|reverse %}
+                                <div class="media mt-4">
+                                    <img class="d-flex mr-3 rounded-circle" src="{{ asset("/build/images/user_placeholder.png") }}" alt="Avatar">
+                                    <div class="media-body">
+                                        <h5 class="mt-0">{{ reply.author }}</h5>
+                                <p>{{ reply.content }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
             {% endfor %}
+        </div>
         {% endif %}
         </div>
-
-        <div class="add-comment">
-            <form action="{{ path('post_comment', { 'postId': post.id }) }}" method="post" class="comment-form" enctype="multipart/form-data">
-                <div class="comment-box">
-                    <textarea  name="comment[content]" required="required"></textarea>
-                </div>
-                <button class="btn btn-lg btn-primary" type="submit">Add comment</button>
-            </form>
-        </div>
-
-        <div class="comment">
-            {% for comment in comments %}
-                <p>{{ comment.content }}</p>
-                {% if comment.children is defined %}
-                    {% for reply in comment.children|reverse %}
-                        <p>{{ reply.content }}</p>
-                    {% endfor %}
-                {% endif %}
-                <p onclick="showReplyBox('{{ comment.id }}')" id="{{ comment.id }}reply">Reply</p>
-                <div  style="display: none" id="reply{{ comment.id }}">
-                <form action="{{ path('post_comment', { 'postId': post.id, 'parentId' : comment.id }) }}" method="post" class="comment-form" enctype="multipart/form-data">
-                    <div class="comment-box">
-                        <textarea  name="comment[content]" required="required"></textarea>
-                    </div>
-                    <button class="btn btn-lg btn-primary" type="submit">Add reply</button>
-                </form>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    </main>
 {% endblock %}

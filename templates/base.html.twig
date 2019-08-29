@@ -3,16 +3,29 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Photo posts!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+            <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('build/css/base.css') }}"/>
+        {% endblock %}
     </head>
     <body>
-        {% if is_granted("ROLE_USER") %}
-            <a href="{{ path('app_logout') }}">Logout</a>
-        {% else %}
-            <a href="{{ path('app_login') }}">Sign in</a>
-        {% endif %}
-
-        {% block body %}{% endblock %}
+        {% block body %}
+            <header>
+            <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" style="display: inline-block">
+                <a href="{{ path('post_list') }}" class="base-home">Home</a>
+                {% if is_granted("ROLE_USER") %}
+                    <a href="{{ path('post_admin') }}" class="base-home">Admin mode</a>
+                    <a href="{{ path('app_logout') }}" class="sign-in-button">Logout</a>
+                {% else %}
+                    <a href="{{ path('app_login') }}" class="sign-in-button">Sign in</a>
+                {% endif %}
+                <form action="{{ path('post_list') }}" method="get" class="form-inline mt-2 mt-md-0 search-form" enctype="multipart/form-data">
+                    <input type="search" name="search" value="{{ app.request.get('search') }}" class="form-control mr-sm-2 search">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </form>
+            </nav>
+            </header>
+        {% endblock %}
         {% block javascripts %}{% endblock %}
     </body>
 </html>
