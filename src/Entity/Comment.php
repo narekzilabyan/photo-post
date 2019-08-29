@@ -30,12 +30,13 @@ class Comment
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Post", inversedBy="comments")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="cascade")
      */
     private $post;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Comment", inversedBy="children")
+     * @ORM\JoinColumn(onDelete="cascade")
      */
     private $parent;
 

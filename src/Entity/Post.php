@@ -55,7 +55,7 @@ class Post
     private $votes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post")
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="post", cascade={"remove"}, orphanRemoval=true)
      */
     private $comments;
 
